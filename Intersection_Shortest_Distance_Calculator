@@ -1,0 +1,76 @@
+function result = line_line_intersection(C1, D1, C2, D2)
+    % Determines the point of intersection or the smallest distance between two lines.
+    % Parameters:
+    % - C1: Point on the first line (3D vector)
+    % - D1: Direction vector of the first line (3D vector)
+    % - C2: Point on the second line (3D vector)
+    % - D2: Direction vector of the second line (3D vector)
+    % Returns:
+    % - A structure containing the intersection point, shortest distance,
+    %   or parallel status with distance if no intersection.
+
+    % Difference between the centers
+    C1_C2 = C2 - C1;
+    
+    % Direction vector cross-product
+    cross_D1_D2 = cross(D1, D2);
+    cross_norm = norm(cross_D1_D2);
+    
+    % If the cross product is zero, the lines are parallel
+    if cross_norm == 0
+        % Find the distance between the parallel lines
+        distance = norm(dot(C1_C2, D1)) / norm(D1);
+        result.status = 'parallel';
+        result.distance = distance;
+        return;
+    end
+    
+    % Set up the system of equations to solve for t and s
+    A = [D1(:), -D2(:), cross_D1_D2(:)];
+    b = C1_C2(:);
+    
+    % Solve using least squares (similar to np.linalg.lstsq in Python)
+    ts = A \ b;
+    t = ts(1);
+    s = ts(2);
+    
+    % Calculate the closest points on each line
+    P1 = C1 + t * D1;
+    P2 = C2 + s * D2;
+    
+    % Define tolerance for comparison similar to np.allclose in Python
+    rel_tol = 1e-5;
+    abs_tol = 1e-8;
+    
+    % Check if the lines intersect (close within a relative or absolute tolerance)
+    if all(abs(P1 - P2) <= rel_tol * max(abs([P1, P2])) + abs_tol)
+        result.status = 'intersect';
+        result.point_of_intersection = P1;
+    else
+        % If they don't intersect, return the shortest distance between them
+        distance = norm(P1 - P2);
+        result.status = 'no_intersection';
+        result.distance = distance;
+        result.closest_point_on_line_1 = P1;
+        result.closest_point_on_line_2 = P2;
+    end
+end
+
+% Example usage
+C1 = [329073.161, 5827855.874, 155.910];  % Center of circle 1
+D1 = [0.493948, 0.513632, 0.701569];  % Direction of vector 1
+C2 = [329072.857, 5827855.495, 155.481];  % Center of circle 2 RA AXIS
+D2 = [0.015192, -0.776079, 0.630453];  % Direction of vector 2RA AXIS
+
+result = line_line_intersection(C1, D1, C2, D2);
+
+% Output the results
+if strcmp(result.status, 'intersect')
+    fprintf('The lines intersect at point: [%.6f, %.6f, %.6f]\n', result.point_of_intersection);
+elseif strcmp(result.status, 'no_intersection')
+    fprintf('The lines do not intersect. The shortest distance is %.6f meters.\n', result.distance);
+    fprintf('Closest point on line 1: [%.6f, %.6f, %.6f]\n', result.closest_point_on_line_1);
+    fprintf('Closest point on line 2: [%.6f, %.6f, %.6f]\n', result.closest_point_on_line_2);
+else
+    fprintf('The lines are parallel with a distance of %.6f meters.\n', result.distance);
+end
