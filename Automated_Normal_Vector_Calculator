@@ -1,0 +1,129 @@
+% Specify the name of the circle you want to extract
+circle_name = 'L';  % Change this to the desired circle name (e.g., 'A', 'B', 'C', ..., 'P')
+
+% Read data from the Excel file for circle centers
+filename_centers = 'Circle_Centres.xlsx';  % Update the path if needed
+data_centers = readcell(filename_centers);  % Use readcell for mixed data types
+
+% Extract the circle center coordinates for the specified circle
+center_row = strcmp(data_centers(:, 1), circle_name);  % Logical array for matching rows
+
+% Check if the circle was found
+if any(center_row)
+    circle_center = cell2mat(data_centers(center_row, 2:4));  % Extract the coordinates
+    circle_center = circle_center(:)';  % Convert to row vector (1x3)
+
+    % Display the circle center coordinates with 3 decimal places
+    disp(['Circle Center Coordinates for Circle ', circle_name, ':']);
+    fprintf('X: %.3f, Y: %.3f, Z: %.3f\n', circle_center(1), circle_center(2), circle_center(3));
+else
+    disp(['Circle ', circle_name, ' not found in the data.']);
+    return;  % Exit the script if the circle is not found
+end
+
+% Read data from the Excel file for points
+filename_points = 'Adjusted_Coords_IVP_Obs.xlsx';  % Update the path if needed
+data_points = readmatrix(filename_points);  % Use readmatrix for numeric data
+
+% Dynamically extract coordinates based on the specified circle name
+switch circle_name
+    case 'A'
+        A1 = data_points(1, 2:4);  % A1 coordinates
+        A2 = data_points(2, 2:4);  % A2 coordinates
+        A3 = data_points(3, 2:4);  % A3 coordinates
+    case 'B'
+        A1 = data_points(5, 2:4);  % B1 coordinates
+        A2 = data_points(6, 2:4);  % B2 coordinates
+        A3 = data_points(7, 2:4);  % B3 coordinates
+    case 'C'
+        A1 = data_points(9, 2:4);  % C1 coordinates
+        A2 = data_points(10, 2:4);  % C2 coordinates
+        A3 = data_points(11, 2:4); % C3 coordinates
+    case 'D'
+        A1 = data_points(13, 2:4);  % D1 coordinates
+        A2 = data_points(14, 2:4);  % D2 coordinates
+        A3 = data_points(15, 2:4);  % D3 coordinates
+    case 'E'
+        A1 = data_points(17, 2:4);  % E1 coordinates
+        A2 = data_points(18, 2:4);  % E2 coordinates
+        A3 = data_points(19, 2:4);  % E3 coordinates
+    case 'F'
+        A1 = data_points(21, 2:4);  % F1 coordinates
+        A2 = data_points(22, 2:4);  % F2 coordinates
+        A3 = data_points(23, 2:4);  % F3 coordinates
+    case 'G'
+        A1 = data_points(25, 2:4);  % G1 coordinates
+        A2 = data_points(26, 2:4);  % G2 coordinates
+        A3 = data_points(27, 2:4);  % G3 coordinates
+    case 'H'
+        A1 = data_points(29, 2:4);  % H1 coordinates
+        A2 = data_points(30, 2:4);  % H2 coordinates
+        A3 = data_points(31, 2:4);  % H3 coordinates
+    case 'I'
+        A1 = data_points(33, 2:4);  % I1 coordinates
+        A2 = data_points(34, 2:4);  % I2 coordinates
+        A3 = data_points(35, 2:4);  % I3 coordinates
+    case 'J'
+        A1 = data_points(37, 2:4);  % J1 coordinates
+        A2 = data_points(38, 2:4);  % J2 coordinates
+        A3 = data_points(39, 2:4);  % J3 coordinates
+    case 'K'
+        A1 = data_points(41, 2:4);  % K1 coordinates
+        A2 = data_points(42, 2:4);  % K2 coordinates
+        A3 = data_points(43, 2:4);  % K3 coordinates
+    case 'L'
+        A1 = data_points(45, 2:4);  % L1 coordinates
+        A2 = data_points(46, 2:4);  % L2 coordinates
+        A3 = data_points(47, 2:4);  % L3 coordinates
+    case 'M'
+        A1 = data_points(49, 2:4);  % M1 coordinates
+        A2 = data_points(50, 2:4);  % M2 coordinates
+        A3 = data_points(51, 2:4);  % M3 coordinates
+    case 'N'
+        A1 = data_points(53, 2:4);  % N1 coordinates
+        A2 = data_points(54, 2:4);  % N2 coordinates
+        A3 = data_points(55, 2:4);  % N3 coordinates
+    case 'O'
+        A1 = data_points(57, 2:4);  % O1 coordinates
+        A2 = data_points(58, 2:4);  % O2 coordinates
+        A3 = data_points(59, 2:4);  % O3 coordinates
+    case 'P'
+        A1 = data_points(61, 2:4);  % P1 coordinates
+        A2 = data_points(62, 2:4);  % P2 coordinates
+        A3 = data_points(63, 2:4);  % P3 coordinates
+    otherwise
+        disp(['Circle ', circle_name, ' is not supported.']);
+        return;  % Exit if the circle is not recognized
+end
+
+% Display the points used for normal vector calculation
+disp(['Points used for normal vector calculation for Circle ', circle_name, ':']);
+fprintf('%s1: [%.3f, %.3f, %.3f]\n', circle_name, A1(1), A1(2), A1(3));
+fprintf('%s2: [%.3f, %.3f, %.3f]\n', circle_name, A2(1), A2(2), A2(3));
+fprintf('%s3: [%.3f, %.3f, %.3f]\n', circle_name, A3(1), A3(2), A3(3));
+
+% Define the function to calculate the normal vector
+function normal_vector = find_normal_vector(center, point1, point2, point3)
+    % Convert inputs to vectors for easier calculations
+    center = center(:)';
+    point1 = point1(:)';
+    point2 = point2(:)';
+    point3 = point3(:)';
+    
+    % Calculate two vectors on the plane
+    vector1 = point1 - center;  % Vector from center to point1
+    vector2 = point2 - center;  % Vector from center to point2
+    
+    % Compute the normal vector using the cross product
+    normal_vector = cross(vector1, vector2);
+    
+    % Normalize the normal vector
+    normal_vector = normal_vector / norm(normal_vector);
+end
+
+% Use the first three points to find the normal vector
+normal_vector = find_normal_vector(circle_center, A1, A2, A3);
+
+% Display the normal vector without limiting decimal precision
+disp('Normal Vector:');
+fprintf('%.15f %.15f %.15f\n', normal_vector(1), normal_vector(2), normal_vector(3));
