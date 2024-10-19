@@ -1,0 +1,30 @@
+function averaged_normal = average_normal_vectors(normals)
+    % Ensure the input is in the correct format
+    if size(normals, 2) ~= 3
+        error('Input normals must be an Nx3 matrix representing [Nx, Ny, Nz].');
+    end
+    
+    % Normalize each normal vector
+    unit_normals = normals ./ vecnorm(normals, 2, 2);
+    
+    % Sum the unit normal vectors
+    summed_normal = sum(unit_normals, 1);
+    
+    % Normalize the resulting vector to get the averaged normal
+    averaged_normal = summed_normal / norm(summed_normal);
+    
+    % Display the result with full precision
+    fprintf('Averaged Normal Vector: (%f, %f, %f)\n', averaged_normal(1), averaged_normal(2), averaged_normal(3));
+end
+
+% Example usage:
+% Define normal vectors pointing in roughly the same direction
+normals = [
+-0.663079224049592 0.435124142400905 0.609091884146938;
+-0.669336474540682 0.449064260526766 0.591886791343581
+
+
+];
+
+% Calculate the averaged normal vector
+averaged_normal = average_normal_vectors(normals);
